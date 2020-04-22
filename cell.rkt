@@ -1,4 +1,4 @@
-#lang racket
+;; #lang racket
 ;; grid.rkt has (include "cell.rkt") && cell.rkt has #lang racket -> grid.rkt ignores cell.rkt
 
 (require 2htdp/image)

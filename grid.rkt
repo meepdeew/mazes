@@ -74,8 +74,16 @@
 
     (define (title)
       (string-append "(Grid: " (number->string @rows) " x " (number->string @columns) ")\n"))
+
+    (define (top-row num-cols corner horizontal-black)
+      (apply beside 
+              (foldl (lambda (x y) (append (list x) y)) empty
+                     (build-list num-cols
+                                 (lambda (n)
+                                   (list horizontal-black corner))))))
     
     (define/public (to-i)
+      ;; make these global
       (let ([corner (rectangle 10 10 "solid" "black")]
             [horizontal-black (rectangle 50 10 "solid" "black")]
             [horizontal-white (rectangle 50 10 "solid" "white")]
@@ -86,35 +94,36 @@
         (apply
          above
          ;; make dynamic
+         (top-row @columns corner horizontal-black)
          (beside
           corner
           horizontal-black corner
           horizontal-black corner
           horizontal-black corner)
-               (each-row
-                (lambda (row)
-                  (above
-                   ;; interiors-and-east-links
-                   (beside
-                    vertical-black
-                    (apply beside
-                           (map (lambda (cell)
-                                  (if (send cell linked?
-                                            (get-field @east cell))
-                                      (beside interior vertical-white)
-                                      (beside interior vertical-black)))
-                                row))
-                    )
-                   ;; bottoms-and-south-links
-                   (beside
-                    corner
-                    (apply beside
-                           (map (lambda (cell)
-                                  (if (send cell linked?
-                                            (get-field @south cell))
-                                      (beside horizontal-white corner)
-                                      (beside horizontal-black corner)))
-                                row)))))))))
+         (each-row
+          (lambda (row)
+            (above
+             ;; interiors-and-east-links
+             (beside
+              vertical-black
+              (apply beside
+                     (map (lambda (cell)
+                            (if (send cell linked?
+                                      (get-field @east cell))
+                                (beside interior vertical-white)
+                                (beside interior vertical-black)))
+                          row))
+              )
+             ;; bottoms-and-south-links
+             (beside
+              corner
+              (apply beside
+                     (map (lambda (cell)
+                            (if (send cell linked?
+                                      (get-field @south cell))
+                                (beside horizontal-white corner)
+                                (beside horizontal-black corner)))
+                          row)))))))))
 
     (define/public (to-s)
       (apply string-append
@@ -168,7 +177,7 @@ grid1
 #|  Grid Structure (row, column):
 
 '(((0 0) (0 1) (0 2))
-  ((1 0) (1 1) (1 2))
-  ((2 0) (2 1) (2 2)))
+((1 0) (1 1) (1 2))
+((2 0) (2 1) (2 2)))
 
 |#
